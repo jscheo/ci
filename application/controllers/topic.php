@@ -1,5 +1,5 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-class Topic extends CI_Controller {
+class Topic extends MY_Controller {
     function __construct()
     {       
         parent::__construct();
@@ -9,13 +9,16 @@ class Topic extends CI_Controller {
     }
     function index(){        
         $this->_head();
+        $this->_sidebar();
         $this->load->view('main');
-        $this->load->view('footer');
+        $this->_footer();    
     }
+
     function get($id){      
         log_message('debug', 'get 호출');
 
         $this->_head();
+        $this->_sidebar();
         $topic = $this->topic_model->get($id);
         log_message('info', var_export($topic,1));
 
@@ -25,38 +28,45 @@ class Topic extends CI_Controller {
         $this->load->view('get', array('topic'=>$topic));
         log_message('debug', 'footer view 로딩');
 
-        $this->load->view('footer');
+        $this->_footer();
     }
     function add(){
+ 
         // 로그인 필요
-
-
+     
         // 로그인이 되어 있지 않다면 로그인 페이지로 리다이렉션
-        if(true){
+        if(!$this->session->userdata('is_login')){
             $this->load->helper('url');
-            redirect('/auth/login');
+            redirect('/auth/login?returnURL='.rawurlencode(site_url('/topic/add')));
         }
+     
         $this->_head();
-
+        $this->_sidebar();
+         
         $this->load->library('form_validation');
-
+     
         $this->form_validation->set_rules('title', '제목', 'required');
         $this->form_validation->set_rules('description', '본문', 'required');
-
+         
         if ($this->form_validation->run() == FALSE)
         {
-            $this->load->view('add');
+             $this->load->view('add');
         }
         else
         {
             $topic_id = $this->topic_model->add($this->input->post('title'), $this->input->post('description'));
+             
+            // Batch Queue에 notify_email_add_topic 추가
+            $this->load->model('batch_model');
+            $this->batch_model->add(array('job_name'=>'notify_email_add_topic', 'context'=>json_encode(array('topic_id'=>$topic_id))));
+     
             $this->load->helper('url');
-            redirect('/index.php/topic/get/'.$topic_id);
+            redirect('/topic/get/'.$topic_id);
         }
-        
-
-        $this->load->view('footer');
+         
+        $this->_footer();
     }
+    
     function upload_receive_from_ck(){
         // 사용자가 업로드 한 파일을 /static/user/ 디렉토리에 저장한다.
         $config['upload_path'] = './application/static/user';
@@ -117,16 +127,9 @@ class Topic extends CI_Controller {
     function upload_form(){
         $this->_head();
         $this->load->view('upload_form');
-        $this->load->view('footer');
+        $this->_footer();
     }
-    function _head(){
-        var_dump($this->session->userdata('session_test'));
-        
-
-        $this->load->config('opentutorials');
-        $this->load->view('head');
-        $topics = $this->topic_model->gets();
-        $this->load->view('topic_list', array('topics'=>$topics));
-    }
+    
+    
 }
 ?>

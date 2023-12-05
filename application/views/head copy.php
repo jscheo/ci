@@ -16,26 +16,15 @@
             </head>
             
             <body>
-              
-                <div class="navbar navbar-fixed-top">
-                  <div class="navbar-inner">
-                    <div class="container">
-                  
-                      <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
-                      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                      </a>
-                  
-                      <!-- Be sure to leave the brand out there if you want it shown -->
-                      <a class="brand" href="#">JavaScript</a>
-                  
-                      <!-- Everything you want hidden at 940px or less, place within here -->
-                      <div class="nav-collapse collapse">
-                        <!-- .nav, .navbar-search, .navbar-form, etc -->
-                        <ul class="nav pull-right">
-                          <?php
+            <nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">JavaScript</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+      <?php
                           if($this->session->userdata('is_login')){
                           ?>
                             <li><a href="/ci/index.php/auth/logout">로그아웃</a></li>
@@ -48,13 +37,11 @@
                           <?php
                           }
                           ?>
-
-                        </ul>
-                      </div>
-                  
-                    </div>
-                  </div>
-                </div>
+      </ul>
+    </div>
+  </div>
+</nav>
+                
                 <?php
                 if($this->config->item('is_dev')){
                 ?>
